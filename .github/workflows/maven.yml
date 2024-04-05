@@ -33,4 +33,4 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: my-artifact
-        path: ./target/hive-bigquery-connector*.jar
+        path: /home/runner/work/hive-bigquery-connector/hive-bigquery-connector/connector/target/hive-bigquery-connector*.jar
