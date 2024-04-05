@@ -30,4 +30,7 @@ jobs:
     - name: Build with Maven
       run: mvn -DskipTests -B package --file pom.xml
 
-
+    - uses: actions/upload-artifact@v4
+      with:
+        name: my-artifact
+        path: /target/hive-bigquery-connector*.jar
