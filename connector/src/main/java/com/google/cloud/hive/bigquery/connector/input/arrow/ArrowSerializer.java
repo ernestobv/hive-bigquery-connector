@@ -103,17 +103,30 @@ public class ArrowSerializer {
       return new DateWritableV2(((DateDayVector) value).get(rowId));
     }
 
-    if (objectInspector instanceof TimestampObjectInspector) {
-      LocalDateTime localDateTime = ((TimeStampMicroVector) value).getObject(rowId);
-      Timestamp timestamp = DateTimeUtils.getHiveTimestampFromLocalDatetime(localDateTime);
-      return new TimestampWritableV2(timestamp);
+    if (objectInspector instanceof TimestampObjectInspector || objectInspector instanceof TimestampObjectInspector)  {
+      Object time = ((TimeStampVector) value).getObject(rowId);
+      if (time instanceof LocalDateTime) {
+        LocalDateTime localDateTime = (LocalDateTime) time;
+        Timestamp timestamp = DateTimeUtils.getHiveTimestampFromLocalDatetime(localDateTime);
+        return new TimestampWritableV2(timestamp);
+      } else { //instanceof Long
+        long longValue = (Long) time;
+        TimestampTZ timestampTZ = DateTimeUtils.getHiveTimestampTZFromUTC(longValue);
+        return new TimestampLocalTZWritable(timestampTZ);
+      }
     }
 
-    if (objectInspector instanceof TimestampLocalTZObjectInspector) {
-      long longValue = ((TimeStampMicroTZVector) value).get(rowId);
-      TimestampTZ timestampTZ = DateTimeUtils.getHiveTimestampTZFromUTC(longValue);
-      return new TimestampLocalTZWritable(timestampTZ);
-    }
+//    if (objectInspector instanceof TimestampObjectInspector) {
+//      LocalDateTime localDateTime = ((TimeStampMicroVector) value).getObject(rowId);
+//      Timestamp timestamp = DateTimeUtils.getHiveTimestampFromLocalDatetime(localDateTime);
+//      return new TimestampWritableV2(timestamp);
+//    }
+//
+//    if (objectInspector instanceof TimestampLocalTZObjectInspector) {
+//      long longValue = ((TimeStampMicroTZVector) value).get(rowId);
+//      TimestampTZ timestampTZ = DateTimeUtils.getHiveTimestampTZFromUTC(longValue);
+//      return new TimestampLocalTZWritable(timestampTZ);
+//    }
 
     if (objectInspector instanceof ListObjectInspector) { // Array/List type
       ListObjectInspector loi = (ListObjectInspector) objectInspector;
